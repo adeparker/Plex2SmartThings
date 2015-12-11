@@ -71,7 +71,12 @@ def configPage() {
         	href url: "https://graph-eu01-euwest1.api.smartthings.com/api/smartapps/installations/${app.id}/appinfo?access_token=${state.accessToken}", 
             		style:"embedded", required:false, title:"API Information", description: "Tap to view Info"
     	}
-    	
+    
+    	section("Hub Location") {
+            paragraph "Select your Hub location for correct oAuth"
+            input "hubLocation", "enum", title: "Hub Location", required: true, multiple:false, options: ["UK/Europe","USA"]
+	}
+		
 	section("Rooms") {
             paragraph "On the next page you can define up to 5 rooms."
 	}
