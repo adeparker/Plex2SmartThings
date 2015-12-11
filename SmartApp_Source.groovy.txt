@@ -345,6 +345,11 @@ def SetLevels(roomIndex, level) {
 		settings."dimmers${roomIndex}"?.each { dimmer -> dimIfOn(roomIndex, dimmer, level) }
 	}
 }
+
+def SetColours(roomIndex, colour) {
+	logWriter ("SetColours($roomIndex, colour)")
+}
+
 private def dimIfOn(roomIndex, bulb, level) {
 	if (!DimOnlyIfOn(roomIndex) || "on" == bulb.currentSwitch) {
 		bulb.setLevel(level)
