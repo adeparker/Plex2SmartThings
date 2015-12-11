@@ -68,7 +68,7 @@ def configPage() {
             }
     	}
     	section() { 
-        	href url: "https://graph.api.smartthings.com/api/smartapps/installations/${app.id}/appinfo?access_token=${state.accessToken}", 
+        	href url: "https://graph-eu01-euwest1.api.smartthings.com/api/smartapps/installations/${app.id}/appinfo?access_token=${state.accessToken}", 
             		style:"embedded", required:false, title:"API Information", description: "Tap to view Info"
     	}
 		section("Rooms") {
@@ -99,6 +99,7 @@ def roomsPage() {
         }
 		section("Devices (room #1)") {
 			input "hues1", "capability.colorControl", title: "Hue Bulbs", multiple:true, required:false
+			input "colour1", "enum", title: "Hue Color?", required: false, multiple:false, options: ["Red","Green","Blue","Yellow","Orange","Purple","Pink"]
 			input "dimmers1", "capability.switchLevel", title: "Dimmers", multiple: true, required: false
 			input "switches1", "capability.switch", title:"Switches", multiple: true, required: false
 			input "playMode1", "mode", title: "Mode when playing", required:false
@@ -126,6 +127,7 @@ def roomsPage() {
         }
 		section("Devices (room #2)") {
 			input "hues2", "capability.colorControl", title: "Hue Bulbs", multiple:true, required:false
+			input "colour2", "enum", title: "Hue Color?", required: false, multiple:false, options: ["Red","Green","Blue","Yellow","Orange","Purple","Pink"]
 			input "dimmers2", "capability.switchLevel", title: "Dimmers", multiple: true, required: false
 			input "switches2", "capability.switch", title:"Switches", multiple: true, required: false
 			input "playMode2", "mode", title: "Mode when playing", required:false
@@ -153,6 +155,7 @@ def roomsPage() {
         }
 		section("Devices (room #3)") {
 			input "hues3", "capability.colorControl", title: "Hue Bulbs", multiple:true, required:false
+			input "colour3", "enum", title: "Hue Color?", required: false, multiple:false, options: ["Red","Green","Blue","Yellow","Orange","Purple","Pink"]
 			input "dimmers3", "capability.switchLevel", title: "Dimmers", multiple: true, required: false
 			input "switches3", "capability.switch", title:"Switches", multiple: true, required: false
 			input "playMode3", "mode", title: "Mode when playing", required:false
@@ -180,6 +183,7 @@ def roomsPage() {
         }
 		section("Devices (room #4)") {
 			input "hues4", "capability.colorControl", title: "Hue Bulbs", multiple:true, required:false
+			input "colour4", "enum", title: "Hue Color?", required: false, multiple:false, options: ["Red","Green","Blue","Yellow","Orange","Purple","Pink"]
 			input "dimmers4", "capability.switchLevel", title: "Dimmers", multiple: true, required: false
 			input "switches4", "capability.switch", title:"Switches", multiple: true, required: false
 			input "playMode4", "mode", title: "Mode when playing", required:false
@@ -207,6 +211,7 @@ def roomsPage() {
         }
 		section("Devices (room #5)") {
 			input "hues5", "capability.colorControl", title: "Hue Bulbs", multiple:true, required:false
+			input "colour5", "enum", title: "Hue Color?", required: false, multiple:false, options: ["Red","Green","Blue","Yellow","Orange","Purple","Pink"]
 			input "dimmers5", "capability.switchLevel", title: "Dimmers", multiple: true, required: false
 			input "switches5", "capability.switch", title:"Switches", multiple: true, required: false
 			input "playMode5", "mode", title: "Mode when playing", required:false
@@ -251,10 +256,10 @@ def appInfoJson() {
 	def configJson = new groovy.json.JsonOutput().toJson([
     	appId:        app.id,
     	accessToken:  state.accessToken,
-    	appUrl: 	"https://graph.api.smartthings.com/api/smartapps/installations/${app.id}",
-    	onPlay: 	"https://graph.api.smartthings.com/api/smartapps/installations/${app.id}/statechanged/onplay",
-		onPause:	"https://graph.api.smartthings.com/api/smartapps/installations/${app.id}/statechanged/onpause",
-		onStop:		"https://graph.api.smartthings.com/api/smartapps/installations/${app.id}/statechanged/onstop"
+    	appUrl: 	"https://graph-eu01-euwest1.api.smartthings.com/api/smartapps/installations/${app.id}",
+    	onPlay: 	"https://graph-eu01-euwest1.api.smartthings.com/api/smartapps/installations/${app.id}/statechanged/onplay",
+		onPause:	"https://graph-eu01-euwest1.api.smartthings.com/api/smartapps/installations/${app.id}/statechanged/onpause",
+		onStop:		"https://graph-eu01-euwest1.api.smartthings.com/api/smartapps/installations/${app.id}/statechanged/onstop"
     ])
 
     def configString = new groovy.json.JsonOutput().prettyPrint(configJson)
