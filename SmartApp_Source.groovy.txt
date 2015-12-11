@@ -72,11 +72,6 @@ def configPage() {
             		style:"embedded", required:false, title:"API Information", description: "Tap to view Info"
     	}
     	
-    	section("Hub Location") {
-            paragraph "Please choose Hub location for correct oAuth server."
-            input "location", "enum", title: "Hub Location", required: true, multiple:false, options: ["UK/Europe","USA"]
-	}
-    	
 	section("Rooms") {
             paragraph "On the next page you can define up to 5 rooms."
 	}
