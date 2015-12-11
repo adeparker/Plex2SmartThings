@@ -114,6 +114,7 @@ def roomsPage() {
 		section("Config (room #1)") {
 			input(name: "bSwitchOffOnPause1", type: "bool", title: "Turn switches off on pause")
 			input(name: "bDimOnlyIfOn1", type: "bool", title: "Dim bulbs only if they're already on")
+			input(name: "bColourOnlyIfOn1", type: "bool", title: "Change bulb colour only if they're already on")
 			input(name: "bTreatTrailersAsPause1", type: "bool", title: "Use pause config for movie trailers")
 			input(name: "iLevelOnStop1", type: "number", title: "Bulb/dimmer levels on Stop", defaultValue:100)
 			input(name: "iLevelOnPause1", type: "number", title: "Bulb/dimmer levels on Pause", defaultValue:30)
@@ -142,6 +143,7 @@ def roomsPage() {
 		section("Config (room #2)") {
 			input(name: "bSwitchOffOnPause2", type: "bool", title: "Turn switches off on pause")
 			input(name: "bDimOnlyIfOn2", type: "bool", title: "Dim bulbs only if they're already on")
+			input(name: "bColourOnlyIfOn2", type: "bool", title: "Change bulb colour only if they're already on")
 			input(name: "bTreatTrailersAsPause2", type: "bool", title: "Use pause config for movie trailers")
 			input(name: "iLevelOnStop2", type: "number", title: "Bulb/dimmer levels on Stop", defaultValue:100)
 			input(name: "iLevelOnPause2", type: "number", title: "Bulb/dimmer levels on Pause", defaultValue:30)
@@ -170,6 +172,7 @@ def roomsPage() {
 		section("Config (room #3)") {
 			input(name: "bSwitchOffOnPause3", type: "bool", title: "Turn switches off on pause")
 			input(name: "bDimOnlyIfOn3", type: "bool", title: "Dim bulbs only if they're already on")
+			input(name: "bColourOnlyIfOn3", type: "bool", title: "Change bulb colour only if they're already on")
 			input(name: "bTreatTrailersAsPause3", type: "bool", title: "Use pause config for movie trailers")
 			input(name: "iLevelOnStop3", type: "number", title: "Bulb/dimmer levels on Stop", defaultValue:100)
 			input(name: "iLevelOnPause3", type: "number", title: "Bulb/dimmer levels on Pause", defaultValue:30)
@@ -198,6 +201,7 @@ def roomsPage() {
 		section("Config (room #4)") {
 			input(name: "bSwitchOffOnPause4", type: "bool", title: "Turn switches off on pause")
 			input(name: "bDimOnlyIfOn4", type: "bool", title: "Dim bulbs only if they're already on")
+			input(name: "bColourOnlyIfOn4", type: "bool", title: "Change bulb colour only if they're already on")
 			input(name: "bTreatTrailersAsPause4", type: "bool", title: "Use pause config for movie trailers")
 			input(name: "iLevelOnStop4", type: "number", title: "Bulb/dimmer levels on Stop", defaultValue:100)
 			input(name: "iLevelOnPause4", type: "number", title: "Bulb/dimmer levels on Pause", defaultValue:30)
@@ -226,6 +230,7 @@ def roomsPage() {
 		section("Config (room #5)") {
 			input(name: "bSwitchOffOnPause5", type: "bool", title: "Turn switches off on pause")
 			input(name: "bDimOnlyIfOn5", type: "bool", title: "Dim bulbs only if they're already on")
+			input(name: "bColourOnlyIfOn5", type: "bool", title: "Change bulb colour only if they're already on")
 			input(name: "bTreatTrailersAsPause5", type: "bool", title: "Use pause config for movie trailers")
 			input(name: "iLevelOnStop5", type: "number", title: "Bulb/dimmer levels on Stop", defaultValue:100)
 			input(name: "iLevelOnPause5", type: "number", title: "Bulb/dimmer levels on Pause", defaultValue:30)
@@ -295,14 +300,16 @@ def OnCommandRecieved() {
     
     if (command == "onplay") {
         ChangeMode(PlayMode(roomIndex))
-		ExecRoutine(PlayRoutine(roomIndex))
-		SetLevels(roomIndex, LevelOnPlay(roomIndex))
+	ExecRoutine(PlayRoutine(roomIndex))
+	SetLevels(roomIndex, LevelOnPlay(roomIndex))
+	//SetColours(roomIndex, LevelOnPlay(roomIndex))
         SetSwitchesOff(roomIndex)
     }
     else if (command == "onpause") {
         ChangeMode(PauseMode(roomIndex))
-		ExecRoutine(PauseRoutine(roomIndex))
+	ExecRoutine(PauseRoutine(roomIndex))
     	SetLevels(roomIndex, LevelOnPause(roomIndex))
+    	//SetColours(roomIndex, LevelOnPause(roomIndex))
         if(SwitchOffOnPause(roomIndex)) {
        		SetSwitchesOff(roomIndex)
         } else {
@@ -311,7 +318,7 @@ def OnCommandRecieved() {
     }
     else if (command == "onstop") {
         ChangeMode(StopMode(roomIndex))
-		ExecRoutine(StopRoutine(roomIndex))
+	ExecRoutine(StopRoutine(roomIndex))
     	SetLevels(roomIndex, LevelOnStop(roomIndex))
         SetSwitchesOn(roomIndex)
     }
@@ -321,6 +328,7 @@ def ExecRoutine(routine) {
 	if(!routine) return
 	location.helloHome?.execute(routine)
 }
+
 def ChangeMode(newMode) {
     if (newMode != null && newMode != "" && location.mode != newMode) {
         if (location.modes?.find{it.name == newMode}) {
@@ -330,14 +338,17 @@ def ChangeMode(newMode) {
         }
     }
 }
+
 def SetSwitchesOn(roomIndex) {
 	logWriter ("SetSwitchesOn($roomIndex)")
 	settings."switches${roomIndex}"?.on()
 }
+
 def SetSwitchesOff(roomIndex) {
 	logWriter ("SetSwitchesOff($roomIndex)")
 	settings."switches${roomIndex}"?.off()
 }
+
 def SetLevels(roomIndex, level) {
 	if (level != null) {
 		logWriter ("SetLevels($roomIndex, $level)")
@@ -346,8 +357,26 @@ def SetLevels(roomIndex, level) {
 	}
 }
 
-def SetColours(roomIndex, colour) {
-	logWriter ("SetColours($roomIndex, colour)")
+def SetColours(roomIndex, colour, level) {
+	if (colour != null) {
+	
+		def hueColour = 0
+		if(colour == "Blue")
+			hueColour = 70//60
+		else if(colour == "Green")
+			hueColour = 39//30
+		else if(colour == "Yellow")
+			hueColour = 25//16
+		else if(colour == "Orange")
+			hueColour = 10
+		else if(colour == "Purple")
+			hueColour = 75
+		else if(colour == "Pink")
+			hueColour = 83
+			
+		//settings."hues${roomIndex}"?.each { hue -> colourIfOn(roomIndex, hue, colour, level) }
+		logWriter ("SetColours($roomIndex, colour)")
+	}
 }
 
 private def dimIfOn(roomIndex, bulb, level) {
@@ -355,6 +384,15 @@ private def dimIfOn(roomIndex, bulb, level) {
 		bulb.setLevel(level)
 	}
 }
+
+private def colourIfOn(roomIndex, bulb, colour, lightLevel) {
+	def newValue = [hue: colour, saturation: 100, level: (lightLevel as Integer) ?: 100]
+	
+	if (!ColourOnlyIfOn(roomIndex) || "on" == bulb.currentSwitch) {
+		bulb.setColor(newValue)
+	}
+}
+
 private def logWriter(value) {
 	if (state.debugLogging) {
         log.debug "${value}"
@@ -417,7 +455,15 @@ def DimOnlyIfOn(room) {
 	else if(room == 3) return bDimOnlyIfOn3
 	else if(room == 4) return bDimOnlyIfOn4
 	else if(room == 5) return bDimOnlyIfOn5
-    else return false
+    	else return false
+}
+def ColourOnlyIfOn(room) {
+	if(room == 1) return bColourOnlyIfOn1
+	else if(room == 2) return bColourOnlyIfOn2
+	else if(room == 3) return bColourOnlyIfOn3
+	else if(room == 4) return bColourOnlyIfOn4
+	else if(room == 5) return bColourOnlyIfOn5
+    	else return false
 }
 def TreatTrailersAsPause(room) {
 	if(room == 1) return bTreatTrailersAsPause1
@@ -425,7 +471,7 @@ def TreatTrailersAsPause(room) {
 	else if(room == 3) return bTreatTrailersAsPause3
 	else if(room == 4) return bTreatTrailersAsPause4
 	else if(room == 5) return bTreatTrailersAsPause5
-    else return false
+    	else return false
 }
 def SwitchOffOnPause(room) {
 	if(room == 1) return bSwitchOffOnPause1
@@ -433,7 +479,7 @@ def SwitchOffOnPause(room) {
 	else if(room == 3) return bSwitchOffOnPause3
 	else if(room == 4) return bSwitchOffOnPause4
 	else if(room == 5) return bSwitchOffOnPause5
-    else return false
+    	else return false
 }
 def LevelOnStop(room) {
 	if(room == 1) return iLevelOnStop1
@@ -441,7 +487,7 @@ def LevelOnStop(room) {
 	else if(room == 3) return iLevelOnStop3
 	else if(room == 4) return iLevelOnStop4
 	else if(room == 5) return iLevelOnStop5
-    else return 0
+    	else return 0
 }
 def LevelOnPause(room) {
 	if(room == 1) return iLevelOnPause1
@@ -449,7 +495,7 @@ def LevelOnPause(room) {
 	else if(room == 3) return iLevelOnPause3
 	else if(room == 4) return iLevelOnPause4
 	else if(room == 5) return iLevelOnPause5
-    else return 0
+    	else return 0
 }
 def LevelOnPlay(room) {
 	if(room == 1) return iLevelOnPlay1
@@ -457,7 +503,7 @@ def LevelOnPlay(room) {
 	else if(room == 3) return iLevelOnPlay3
 	else if(room == 4) return iLevelOnPlay4
 	else if(room == 5) return iLevelOnPlay5
-    else return 0
+    	else return 0
 }
 
 //Get the first matching room player name, or the first player with name *.
